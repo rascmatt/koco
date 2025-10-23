@@ -41,7 +41,7 @@ Coco/R itself) does not fall under the GNU General Public License.
   in the attributed grammar or as a command-line option
   -------------------------------------------------------------------------*/
 
-package Coco;
+package coco;
 
 import java.io.File;
 

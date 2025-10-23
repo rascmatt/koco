@@ -31,7 +31,7 @@ Coco/R itself) does not fall under the GNU General Public License.
    javac Coco.Coco Coco.ATG -package Coco
 -------------------------------------------------------------------------*/
 
-$package=Coco
+$package=coco
 
 COMPILER Coco
 
