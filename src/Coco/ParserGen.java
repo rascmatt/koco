@@ -130,7 +130,7 @@ public class ParserGen {
 
   void GenErrorMsg (int errTyp, Symbol sym) {
     errorNr++;
-    err.write(ls + "\t\t\tcase " + errorNr + ": s = \"");
+    err.write(ls + "\t\t\t" + errorNr + " -> \"");
     switch (errTyp) {
       case tErr:
         if (sym.name.charAt(0) == '"') err.write(tab.Escape(sym.name) + " expected");
@@ -139,7 +139,7 @@ public class ParserGen {
       case altErr: err.write("invalid " + sym.name); break;
       case syncErr: err.write("this symbol not expected in " + sym.name); break;
     }
-    err.write("\"; break;");
+    err.write("\"");
   }
 
   int NewCondSet (BitSet s) {
@@ -169,10 +169,16 @@ public class ParserGen {
   }
 
   void PutCaseLabels (BitSet s) {
+    boolean first = true;
     for (int i = 0; i < tab.terminals.size(); i++) {
       Symbol sym = (Symbol)tab.terminals.get(i);
-      if (s.get(sym.n)) gen.print("case " + sym.n + ": ");
+      if (s.get(sym.n)) {
+          if (!first) gen.print(", ");
+          first = false;
+          gen.print(sym.n);
+      }
     }
+    gen.print(" -> ");
   }
 
   void GenCode (Node p, int indent, BitSet isChecked) {
@@ -185,21 +191,21 @@ public class ParserGen {
           if (p.retVar != null) gen.print(p.retVar + " = ");
           gen.print(p.sym.name + "(");
           CopySourcePart(p.pos, 0);
-          gen.println(");");
+          gen.println(")");
           break;
         }
         case Node.t: {
           Indent(indent);
           // assert: if isChecked[p.sym.n] is true, then isChecked contains only p.sym.n
-          if (isChecked.get(p.sym.n)) gen.println("Get();");
-          else gen.println("Expect(" + p.sym.n + ");");
+          if (isChecked.get(p.sym.n)) gen.println("Get()");
+          else gen.println("Expect(" + p.sym.n + ")");
           break;
         }
         case Node.wt: {
           Indent(indent);
           s1 = tab.Expected(p.next, curSy);
           s1.or(tab.allSyncSets);
-          gen.println("ExpectWeak(" + p.sym.n + ", " + NewCondSet(s1) + ");");
+          gen.println("ExpectWeak(" + p.sym.n + ", " + NewCondSet(s1) + ")");
           break;
         }
         case Node.any: {
@@ -207,12 +213,12 @@ public class ParserGen {
           int acc = Sets.Elements(p.set);
           if (tab.terminals.size() == (acc + 1) || (acc > 0 && Sets.Equals(p.set, isChecked))) {
             // either this ANY accepts any terminal (the + 1 = end of file), or exactly what's allowed here
-            gen.println("Get();");
+            gen.println("Get()");
           } else {
             GenErrorMsg(altErr, curSy);
             if (acc > 0) {
-              gen.print("if ("); GenCond(p.set, p); gen.println(") Get(); else SynErr(" + errorNr + ");");
-            } else gen.println("SynErr(" + errorNr + "); // ANY node that matches no symbol");
+              gen.print("if ("); GenCond(p.set, p); gen.println(") Get() else SynErr(" + errorNr + ")");
+            } else gen.println("SynErr(" + errorNr + ") // ANY node that matches no symbol");
           }
           break;
         }
@@ -234,7 +240,7 @@ public class ParserGen {
           s1 = tab.First(p);
           boolean equal = Sets.Equals(s1, isChecked);
           boolean useSwitch = UseSwitch(p);
-          if (useSwitch) { Indent(indent); gen.println("switch (la.kind) {"); }
+          if (useSwitch) { Indent(indent); gen.println("when (la.kind) {"); }
           p2 = p;
           while (p2 != null) {
             s1 = tab.Expected(p2.sub, curSy);
@@ -249,7 +255,6 @@ public class ParserGen {
             }
             GenCode(p2.sub, indent + 1, s1);
             if (useSwitch) {
-              Indent(indent); gen.println("\tbreak;");
               Indent(indent); gen.println("}");
             }
             p2 = p2.down;
@@ -260,10 +265,10 @@ public class ParserGen {
           } else {
             GenErrorMsg(altErr, curSy);
             if (useSwitch) {
-              gen.println("default: SynErr(" + errorNr + "); break;");
+              gen.println("else -> SynErr(" + errorNr + ")");
               Indent(indent); gen.println("}");
             } else {
-              gen.print("} "); gen.println("else SynErr(" + errorNr + ");");
+              gen.print("} "); gen.println("else SynErr(" + errorNr + ")");
             }
           }
           break;
@@ -308,14 +313,14 @@ public class ParserGen {
     for (int i = 0; i < tab.terminals.size(); i++) {
       Symbol sym = (Symbol)tab.terminals.get(i);
       if (Character.isLetter(sym.name.charAt(0)))
-        gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
+        gen.println("\t\tconst val _" + sym.name + " = " + sym.n + ";");
     }
   }
 
   void GenPragmas() {
     for (int i = 0; i < tab.pragmas.size(); i++) {
       Symbol sym = (Symbol)tab.pragmas.get(i);
-      gen.println("\tpublic static final int _" + sym.name + " = " + sym.n + ";");
+      gen.println("\t\tconst val _" + sym.name + " = " + sym.n + ";");
     }
   }
 
@@ -334,15 +339,16 @@ public class ParserGen {
     for (int i = 0; i < tab.nonterminals.size(); i++) {
       Symbol sym = (Symbol)tab.nonterminals.get(i);
       curSy = sym;
-      gen.print("\t");
-      if (sym.retType == null) gen.print("void "); else gen.print(sym.retType + " ");
+      gen.print("\tprivate fun ");
       gen.print(sym.name + "(");
       CopySourcePart(sym.attrPos, 0);
-      gen.println(") {");
-      if (sym.retVar != null) gen.println("\t\t" + sym.retType + " " + sym.retVar + ";");
+      gen.print(")");
+      if (sym.retType != null) gen.print(": " + sym.retType);
+      gen.println(" {");
+      if (sym.retVar != null) gen.println("\t\tvar " + sym.retVar + ": " + sym.retType);
       CopySourcePart(sym.semPos, 2);
       GenCode(sym.graph, 2, new BitSet(tab.terminals.size()));
-      if (sym.retVar != null) gen.println("\t\treturn " + sym.retVar + ";");
+      if (sym.retVar != null) gen.println("\t\treturn " + sym.retVar);
       gen.println("\t}"); gen.println();
     }
   }
@@ -350,7 +356,7 @@ public class ParserGen {
   void InitSets() {
     for (int i = 0; i < symSet.size(); i++) {
       BitSet s = (BitSet)symSet.get(i);
-      gen.print("\t\t{");
+      gen.print("\t\tarrayOf(");
       int j = 0;
       //foreach (Symbol sym in Symbol.terminals) {
       for (int k = 0; k < tab.terminals.size(); k++) {
@@ -359,7 +365,7 @@ public class ParserGen {
         ++j;
         if (j%4 == 0) gen.print(" ");
       }
-      if (i == symSet.size()-1) gen.println("_x}"); else gen.println("_x},");
+      if (i == symSet.size()-1) gen.println("_x)"); else gen.println("_x),");
     }
   }
 
@@ -369,7 +375,7 @@ public class ParserGen {
     symSet.add(tab.allSyncSets);
 
     fram = g.OpenFrame("Parser.frame");
-    gen = g.OpenGen("Parser.java");
+    gen = g.OpenGen("Parser.kt");
     err = new StringWriter();
     //foreach (Symbol sym in Symbol.terminals)
     for (int i = 0; i < tab.terminals.size(); i++) {
@@ -384,21 +390,23 @@ public class ParserGen {
 
     if (tab.nsName != null && tab.nsName.length() > 0) {
       gen.print("package ");
-      gen.print(tab.nsName);
-      gen.print(";");
+      gen.println(tab.nsName);
     }
     if (usingPos != null) {
       gen.println(); gen.println();
       CopySourcePart(usingPos, 0);
     }
+
     g.CopyFramePart("-->constants");
+
     GenTokens();
-    gen.println("\tpublic static final int maxT = " + (tab.terminals.size()-1) + ";");
+    gen.println("\t\tconst val maxT = " + (tab.terminals.size()-1));
     GenPragmas();
+
     g.CopyFramePart("-->declarations"); CopySourcePart(tab.semDeclPos, 0);
     g.CopyFramePart("-->pragmas"); GenCodePragmas();
     g.CopyFramePart("-->productions"); GenProductions();
-    g.CopyFramePart("-->parseRoot"); gen.println("\t\t" + tab.gramSy.name + "();"); if (tab.checkEOF) gen.println("\t\tExpect(0);");
+    g.CopyFramePart("-->parseRoot"); gen.println("\t\t" + tab.gramSy.name + "()"); if (tab.checkEOF) gen.println("\t\tExpect(0)");
     g.CopyFramePart("-->initialization"); InitSets();
     g.CopyFramePart("-->errors"); gen.print(err.toString());
     g.CopyFramePart(null);
@@ -424,9 +432,9 @@ public class ParserGen {
 
   public ParserGen (Parser parser) {
     tab = parser.tab;
-    errors = parser.errors;
+    errors = parser.getErrors();
     trace = parser.trace;
-    buffer = parser.scanner.buffer;
+    buffer = parser.getScanner().buffer;
     errorNr = -1;
     usingPos = null;
   }

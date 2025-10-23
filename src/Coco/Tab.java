@@ -228,7 +228,7 @@ public class Tab {
 	public Tab(Parser parser) {
 		this.parser = parser;
 		trace = parser.trace;
-		errors = parser.errors;
+		errors = parser.getErrors();
 		eofSy = NewSym(Node.t, "EOF", 0);
 		dummyNode = NewNode(Node.eps, null, 0);
 		literals = new Hashtable();

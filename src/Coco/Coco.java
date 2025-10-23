@@ -80,8 +80,8 @@ public class Coco {
         parser.Parse();
 
         parser.trace.Close();
-        System.out.println(parser.errors.count + " errors detected");
-        if (parser.errors.count == 0) { retVal = 0; }
+        System.out.println(parser.getErrors().getCount() + " errors detected");
+        if (parser.getErrors().getCount() == 0) { retVal = 0; }
       } catch (FatalError e) {
         System.out.println(e.getMessage());
       }

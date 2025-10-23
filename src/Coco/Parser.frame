@@ -27,141 +27,138 @@ Coco/R itself) does not fall under the GNU General Public License.
 ------------------------------------------------------------------------*/
 -->begin
 
-public class Parser {
+class Parser(var scanner: Scanner) {
+
+    companion object {
+
 -->constants
-	static final boolean _T = true;
-	static final boolean _x = false;
-	static final int minErrDist = 2;
 
-	public Token t;    // last recognized token
-	public Token la;   // lookahead token
-	int errDist = minErrDist;
-	
-	public Scanner scanner;
-	public Errors errors;
+        const val _T = true;
+        const val _x = false;
+        const val minErrDist = 2;
+    }
 
-	-->declarations
+    -->declarations
 
-	public Parser(Scanner scanner) {
-		this.scanner = scanner;
-		errors = new Errors();
+	private lateinit var t: Token    // last recognized token
+	private lateinit var la: Token   // lookahead token
+	var errDist = minErrDist
+
+	val errors: Errors = Errors()
+
+	private fun SynErr (n: Int) {
+		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n)
+		errDist = 0
 	}
 
-	void SynErr (int n) {
-		if (errDist >= minErrDist) errors.SynErr(la.line, la.col, n);
-		errDist = 0;
-	}
-
-	public void SemErr (String msg) {
-		if (errDist >= minErrDist) errors.SemErr(t.line, t.col, msg);
-		errDist = 0;
+	fun SemErr (msg: String) {
+		if (errDist >= minErrDist) errors.SemErr(t.line, t.col, msg)
+		errDist = 0
 	}
 	
-	void Get () {
-		for (;;) {
-			t = la;
-			la = scanner.Scan();
+	private fun Get () {
+		while (true) {
+			t = la
+			la = scanner.Scan()
 			if (la.kind <= maxT) {
-				++errDist;
-				break;
+				++errDist
+				break
 			}
 -->pragmas
-			la = t;
+			la = t
 		}
 	}
 	
-	void Expect (int n) {
-		if (la.kind==n) Get(); else { SynErr(n); }
+	private fun Expect (n: Int) {
+		if (la.kind==n) Get() else { SynErr(n) }
 	}
 	
-	boolean StartOf (int s) {
-		return set[s][la.kind];
+	private fun StartOf (s: Int): Boolean {
+		return set[s][la.kind]
 	}
 	
-	void ExpectWeak (int n, int follow) {
-		if (la.kind == n) Get();
+	private fun ExpectWeak (n: Int, follow: Int) {
+		if (la.kind == n) Get()
 		else {
-			SynErr(n);
-			while (!StartOf(follow)) Get();
+			SynErr(n)
+			while (!StartOf(follow)) Get()
 		}
 	}
 	
-	boolean WeakSeparator (int n, int syFol, int repFol) {
-		int kind = la.kind;
-		if (kind == n) { Get(); return true; }
-		else if (StartOf(repFol)) return false;
+	private fun WeakSeparator (n: Int, syFol: Int, repFol: Int): Boolean {
+		var kind = la.kind
+		if (kind == n) { Get(); return true }
+		else if (StartOf(repFol)) return false
 		else {
-			SynErr(n);
+			SynErr(n)
 			while (!(set[syFol][kind] || set[repFol][kind] || set[0][kind])) {
-				Get();
-				kind = la.kind;
+				Get()
+				kind = la.kind
 			}
-			return StartOf(syFol);
+			return StartOf(syFol)
 		}
 	}
 	
 -->productions
 
-	public void Parse() {
-		la = new Token();
-		la.val = "";		
-		Get();
+	fun Parse() {
+		la = Token()
+		la.`val` = ""
+		Get()
 -->parseRoot
-		scanner.buffer.Close();
+		scanner.buffer.Close()
 	}
 
-	private static final boolean[][] set = {
+	val set: Array<Array<Boolean>> = arrayOf(
 -->initialization
-	};
+    )
+
 } // end Parser
 
 
 class Errors {
-	public int count = 0;                                    // number of errors detected
-	public java.io.PrintStream errorStream = System.out;     // error messages go to this stream
-	public String errMsgFormat = "-- line {0} col {1}: {2}"; // 0=line, 1=column, 2=text
+	var count = 0;                                  // number of errors detected
+	val errorStream = System.out;                   // error messages go to this stream
+	val errMsgFormat = "-- line {0} col {1}: {2}";  // 0=line, 1=column, 2=text
 	
-	protected void printMsg(int line, int column, String msg) {
-		StringBuffer b = new StringBuffer(errMsgFormat);
-		int pos = b.indexOf("{0}");
-		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, line); }
-		pos = b.indexOf("{1}");
-		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, column); }
-		pos = b.indexOf("{2}");
-		if (pos >= 0) b.replace(pos, pos+3, msg);
-		errorStream.println(b.toString());
+	protected fun printMsg(line: Int, column: Int, msg: String) {
+		val b = StringBuffer(errMsgFormat)
+		var pos = b.indexOf("{0}")
+		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, line) }
+		pos = b.indexOf("{1}")
+		if (pos >= 0) { b.delete(pos, pos+3); b.insert(pos, column) }
+		pos = b.indexOf("{2}")
+		if (pos >= 0) b.replace(pos, pos+3, msg)
+		errorStream.println(b.toString())
 	}
 	
-	public void SynErr (int line, int col, int n) {
-		String s;
-		switch (n) {-->errors
-			default: s = "error " + n; break;
+	fun SynErr (line: Int, col: Int, n: Int) {
+		val s = when (n) {
+		    -->errors
+			else -> "error $n"
 		}
 		printMsg(line, col, s);
 		count++;
 	}
 
-	public void SemErr (int line, int col, String s) {	
-		printMsg(line, col, s);
-		count++;
+	fun SemErr (line: Int, col: Int, s: String) {
+		printMsg(line, col, s)
+		count++
 	}
 	
-	public void SemErr (String s) {
-		errorStream.println(s);
-		count++;
+	fun SemErr (s: String) {
+		errorStream.println(s)
+		count++
 	}
 	
-	public void Warning (int line, int col, String s) {	
-		printMsg(line, col, s);
+	fun Warning (line: Int, col: Int, s: String) {
+		printMsg(line, col, s)
 	}
 	
-	public void Warning (String s) {
-		errorStream.println(s);
+	fun Warning (s: String) {
+		errorStream.println(s)
 	}
 } // Errors
 
 
-class FatalError extends RuntimeException {
-	public static final long serialVersionUID = 1L;
-	public FatalError(String s) { super(s); }
-}
+class FatalError(s: String) : RuntimeException(s)

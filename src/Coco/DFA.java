@@ -1074,7 +1074,7 @@ public class DFA {
   public DFA (Parser parser) {
     this.parser = parser;
     tab = parser.tab;
-    errors = parser.errors;
+    errors = parser.getErrors();
     trace = parser.trace;
     firstState = null; lastState = null; lastStateNr = -1;
     firstState = NewState();
