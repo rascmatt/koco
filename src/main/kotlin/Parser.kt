@@ -600,7 +600,7 @@ class Parser(var scanner: Scanner) {
 			s = Sym()
 			var sym: Symbol? = tab.FindSym(s.name)
 			if (sym == null && s.kind == str)
-			 sym = tab.literals.get(s.name) as Symbol
+			 sym = tab.literals[s.name]?.let { it as Symbol }
 			val undef = sym == null
 			if (undef) {
 			 if (s.kind == id)
