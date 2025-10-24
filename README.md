@@ -4,7 +4,9 @@
 
 ## Project status
 
-So far only the generated Parser has been ported to Kotlin. The next step will be to additionally port the Scanner.
+So far only the generated Parser has been ported to Kotlin. Arguably this is the most important part, since it allows
+to write Kotlin syntax within the semantic actions of the ATG. The next step would be to port the parser, which is the
+second deliverable of the generator.
 
 ## Build
 
