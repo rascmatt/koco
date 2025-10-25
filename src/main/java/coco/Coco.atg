@@ -296,9 +296,9 @@ AttrDecl<sym: Symbol>            (. var beg: Int; var col: Int .)
   ).
 
 /*------------------------------------------------------------------------------------*/
-// type names may contain angle brackets for generics
+// type names may contain angle brackets for generics, or ? for kotlin's nullable types
 TypeName
-= ident {'.' ident | '[' ']' | '<' TypeName {',' TypeName} '>'}.
+= ident { '.' ident | '[' ']' | '<' TypeName {',' TypeName} '>'} [ '?' ].
 
 /*------------------------------------------------------------------------------------*/
 

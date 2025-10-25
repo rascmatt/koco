@@ -38,9 +38,9 @@ class Parser(var scanner: Scanner) {
 		const val _string = 3;
 		const val _badString = 4;
 		const val _char = 5;
-		const val maxT = 44
-		const val _ddtSym = 45;
-		const val _optionSym = 46;
+		const val maxT = 45
+		const val _ddtSym = 46;
+		const val _optionSym = 47;
 
 
         const val _T = true;
@@ -89,10 +89,10 @@ class Parser(var scanner: Scanner) {
 				break
 			}
 
-			if (la.kind == 45) {
+			if (la.kind == 46) {
 				tab.SetDDT(la.`val`) 
 			}
-			if (la.kind == 46) {
+			if (la.kind == 47) {
 				tab.SetOption(la.`val`) 
 			}
 			la = t
@@ -130,6 +130,7 @@ class Parser(var scanner: Scanner) {
 	}
 	
 	private fun Coco() {
+
 		var sym: Symbol?; var g: Graph; var g1: Graph; var g2: Graph; var gramName: String; var s: CharSet; var beg: Int; 
 		if (StartOf(1)) {
 			Get()
@@ -190,7 +191,7 @@ class Parser(var scanner: Scanner) {
 			s = Set()
 			tab.ignored.Or(s) 
 		}
-		while (!(la.kind == 0 || la.kind == 16)) {SynErr(45); Get();}
+		while (!(la.kind == 0 || la.kind == 16)) {SynErr(46); Get();}
 		Expect(16)
 		if (genScanner) dfa.MakeDeterministic()
 		tab.DeleteNodes()
@@ -221,7 +222,7 @@ class Parser(var scanner: Scanner) {
 			   || noRet != (sym.retVar == null))
 			   SemErr("attribute mismatch between declaration and use of this symbol")
 			
-			if (la.kind == 42) {
+			if (la.kind == 43) {
 				sym.semPos = SemText()
 			}
 			ExpectWeak(17, 3)
@@ -269,6 +270,7 @@ class Parser(var scanner: Scanner) {
 	}
 
 	private fun SetDecl() {
+
 		var s: CharSet 
 		Expect(1)
 		val name = t.`val`;
@@ -284,6 +286,7 @@ class Parser(var scanner: Scanner) {
 	}
 
 	private fun TokenDecl(typ: Int) {
+
 		var s: SymInfo; var sym: Symbol?; var g: Graph; 
 		s = Sym()
 		sym = tab.FindSym(s.name);
@@ -294,7 +297,7 @@ class Parser(var scanner: Scanner) {
 		}
 		tokenString = null
 		
-		while (!(StartOf(5))) {SynErr(46); Get();}
+		while (!(StartOf(5))) {SynErr(47); Get();}
 		if (la.kind == 17) {
 			Get()
 			g = TokenExpr()
@@ -314,8 +317,8 @@ class Parser(var scanner: Scanner) {
 			if (s.kind == id) genScanner = false
 			else dfa.MatchLiteral(sym.name, sym)
 			
-		} else SynErr(47)
-		if (la.kind == 42) {
+		} else SynErr(48)
+		if (la.kind == 43) {
 			sym.semPos = SemText()
 			if (typ != Node.pr) SemErr("semantic action not allowed here") 
 		}
@@ -326,7 +329,7 @@ class Parser(var scanner: Scanner) {
 		var g2: Graph 
 		g = TokenTerm()
 		var first = true; 
-		while (WeakSeparator(33,7,8) ) {
+		while (WeakSeparator(34,7,8) ) {
 			g2 = TokenTerm()
 			if (first) { tab.MakeFirstAlt(g); first = false }
 			tab.MakeAlternative(g, g2)
@@ -354,6 +357,7 @@ class Parser(var scanner: Scanner) {
 	}
 
 	private fun AttrDecl(sym: Symbol) {
+
 		var beg: Int; var col: Int 
 		if (la.kind == 24) {
 			Get()
@@ -379,7 +383,7 @@ class Parser(var scanner: Scanner) {
 					Expect(27)
 					if (t.pos > beg)
 					 sym.attrPos = Position(beg, t.pos, col) 
-				} else SynErr(48)
+				} else SynErr(49)
 			} else if (StartOf(10)) {
 				beg = la.pos; col = la.col 
 				if (StartOf(11)) {
@@ -391,7 +395,7 @@ class Parser(var scanner: Scanner) {
 				Expect(27)
 				if (t.pos > beg)
 				 sym.attrPos = Position(beg, t.pos, col) 
-			} else SynErr(49)
+			} else SynErr(50)
 		} else if (la.kind == 29) {
 			Get()
 			if (la.kind == 25 || la.kind == 26) {
@@ -416,7 +420,7 @@ class Parser(var scanner: Scanner) {
 					Expect(30)
 					if (t.pos > beg)
 					 sym.attrPos = Position(beg, t.pos, col) 
-				} else SynErr(50)
+				} else SynErr(51)
 			} else if (StartOf(10)) {
 				beg = la.pos; col = la.col 
 				if (StartOf(13)) {
@@ -428,13 +432,13 @@ class Parser(var scanner: Scanner) {
 				Expect(30)
 				if (t.pos > beg)
 				 sym.attrPos = Position(beg, t.pos, col) 
-			} else SynErr(51)
-		} else SynErr(52)
+			} else SynErr(52)
+		} else SynErr(53)
 	}
 
 	private fun SemText(): Position  {
 		var pos: Position 
-		Expect(42)
+		Expect(43)
 		val beg = la.pos; val col = la.col 
 		while (StartOf(14)) {
 			if (StartOf(15)) {
@@ -447,7 +451,7 @@ class Parser(var scanner: Scanner) {
 				SemErr("missing end of previous semantic action") 
 			}
 		}
-		Expect(43)
+		Expect(44)
 		pos = Position(beg, t.pos, col) 
 		return pos
 	}
@@ -457,7 +461,7 @@ class Parser(var scanner: Scanner) {
 		var g2: Graph; 
 		g = Term()
 		var first = true; 
-		while (WeakSeparator(33,16,17) ) {
+		while (WeakSeparator(34,16,17) ) {
 			g2 = Term()
 			if (first) { tab.MakeFirstAlt(g); first = false }
 			tab.MakeAlternative(g, g2)
@@ -493,7 +497,7 @@ class Parser(var scanner: Scanner) {
 		} else if (la.kind == 23) {
 			Get()
 			s = CharSet(); s.Fill() 
-		} else SynErr(53)
+		} else SynErr(54)
 		return s
 	}
 
@@ -527,11 +531,12 @@ class Parser(var scanner: Scanner) {
 			if (dfa.ignoreCase) s.name = s.name.lowercase()
 			if (s.name.indexOf(' ') >= 0)
 			 SemErr("literal tokens must not contain blanks") 
-		} else SynErr(54)
+		} else SynErr(55)
 		return s
 	}
 
 	private fun TypeName() {
+
 		Expect(1)
 		while (la.kind == 18 || la.kind == 24 || la.kind == 31) {
 			if (la.kind == 18) {
@@ -550,13 +555,16 @@ class Parser(var scanner: Scanner) {
 				Expect(27)
 			}
 		}
+		if (la.kind == 33) {
+			Get()
+		}
 	}
 
 	private fun Term(): Graph  {
 		var result: Graph 
 		var g: Graph? = null; var g2: Graph; var rslv: Node? = null        
 		if (StartOf(18)) {
-			if (la.kind == 40) {
+			if (la.kind == 41) {
 				rslv = tab.NewNode(Node.rslv, null, la.line) 
 				rslv.pos = Resolver()
 				g = Graph(rslv)                              
@@ -571,7 +579,7 @@ class Parser(var scanner: Scanner) {
 			}
 		} else if (StartOf(20)) {
 			g = Graph(tab.NewNode(Node.eps, null, 0))    
-		} else SynErr(55)
+		} else SynErr(56)
 		result = g ?: Graph(tab.NewNode(Node.eps, null, 0)) // invalid start of Term
 		
 		return result
@@ -579,8 +587,8 @@ class Parser(var scanner: Scanner) {
 
 	private fun Resolver(): Position  {
 		var pos: Position 
-		Expect(40)
-		Expect(35)
+		Expect(41)
+		Expect(36)
 		val beg = la.pos; val col = la.col 
 		Condition()
 		pos = Position(beg, t.pos, col) 
@@ -592,8 +600,8 @@ class Parser(var scanner: Scanner) {
 		var s: SymInfo; var pos: Position; var weak = false;
 		var g: Graph? = null; 
 		when (la.kind) {
-		1, 3, 5, 34 -> {
-			if (la.kind == 34) {
+		1, 3, 5, 35 -> {
+			if (la.kind == 35) {
 				Get()
 				weak = true 
 			}
@@ -634,10 +642,10 @@ class Parser(var scanner: Scanner) {
 			 SemErr("attribute mismatch between declaration and use of this symbol");
 			
 		}
-		35 -> {
+		36 -> {
 			Get()
 			g = Expression()
-			Expect(36)
+			Expect(37)
 		}
 		31 -> {
 			Get()
@@ -645,13 +653,13 @@ class Parser(var scanner: Scanner) {
 			Expect(32)
 			tab.MakeOption(g) 
 		}
-		37 -> {
+		38 -> {
 			Get()
 			g = Expression()
-			Expect(38)
+			Expect(39)
 			tab.MakeIteration(g) 
 		}
-		42 -> {
+		43 -> {
 			pos = SemText()
 			val p = tab.NewNode(Node.sem, null, 0)
 			p.pos = pos
@@ -664,13 +672,13 @@ class Parser(var scanner: Scanner) {
 			g = Graph(p)
 			
 		}
-		39 -> {
+		40 -> {
 			Get()
 			val p = tab.NewNode(Node.sync, null, 0)
 			g = Graph(p)
 			
 		}
-		else -> SynErr(56)
+		else -> SynErr(57)
 		}
 		result = g ?: Graph(tab.NewNode(Node.eps, null, 0))
 		
@@ -678,6 +686,7 @@ class Parser(var scanner: Scanner) {
 	}
 
 	private fun Attribs(n: Node) {
+
 		var beg: Int; var col: Int 
 		if (la.kind == 24) {
 			Get()
@@ -691,7 +700,7 @@ class Parser(var scanner: Scanner) {
 				while (StartOf(21)) {
 					if (StartOf(22)) {
 						Get()
-					} else if (la.kind == 31 || la.kind == 35) {
+					} else if (la.kind == 31 || la.kind == 36) {
 						Bracketed()
 					} else {
 						Get()
@@ -714,7 +723,7 @@ class Parser(var scanner: Scanner) {
 					}
 					Expect(27)
 					if (t.pos > beg) n.pos = Position(beg, t.pos, col) 
-				} else SynErr(57)
+				} else SynErr(58)
 			} else if (StartOf(10)) {
 				beg = la.pos; col = la.col 
 				if (StartOf(11)) {
@@ -735,7 +744,7 @@ class Parser(var scanner: Scanner) {
 				}
 				Expect(27)
 				if (t.pos > beg) n.pos = Position(beg, t.pos, col) 
-			} else SynErr(58)
+			} else SynErr(59)
 		} else if (la.kind == 29) {
 			Get()
 			if (la.kind == 25 || la.kind == 26) {
@@ -748,7 +757,7 @@ class Parser(var scanner: Scanner) {
 				while (StartOf(25)) {
 					if (StartOf(26)) {
 						Get()
-					} else if (la.kind == 31 || la.kind == 35) {
+					} else if (la.kind == 31 || la.kind == 36) {
 						Bracketed()
 					} else {
 						Get()
@@ -771,7 +780,7 @@ class Parser(var scanner: Scanner) {
 					}
 					Expect(30)
 					if (t.pos > beg) n.pos = Position(beg, t.pos, col) 
-				} else SynErr(59)
+				} else SynErr(60)
 			} else if (StartOf(10)) {
 				beg = la.pos; col = la.col 
 				if (StartOf(13)) {
@@ -792,20 +801,21 @@ class Parser(var scanner: Scanner) {
 				}
 				Expect(30)
 				if (t.pos > beg) n.pos = Position(beg, t.pos, col) 
-			} else SynErr(60)
-		} else SynErr(61)
+			} else SynErr(61)
+		} else SynErr(62)
 	}
 
 	private fun Condition() {
+
 		while (StartOf(29)) {
-			if (la.kind == 35) {
+			if (la.kind == 36) {
 				Get()
 				Condition()
 			} else {
 				Get()
 			}
 		}
-		Expect(36)
+		Expect(37)
 	}
 
 	private fun TokenTerm(): Graph  {
@@ -816,13 +826,13 @@ class Parser(var scanner: Scanner) {
 			g2 = TokenFactor()
 			tab.MakeSequence(g, g2) 
 		}
-		if (la.kind == 41) {
+		if (la.kind == 42) {
 			Get()
-			Expect(35)
+			Expect(36)
 			g2 = TokenExpr()
 			tab.SetContextTrans(g2.l); dfa.hasCtxMoves = true
 			tab.MakeSequence(g, g2) 
-			Expect(36)
+			Expect(37)
 		}
 		return g
 	}
@@ -848,48 +858,49 @@ class Parser(var scanner: Scanner) {
 			 else tokenString = noString
 			}
 			
-		} else if (la.kind == 35) {
+		} else if (la.kind == 36) {
 			Get()
 			g = TokenExpr()
-			Expect(36)
+			Expect(37)
 		} else if (la.kind == 31) {
 			Get()
 			g = TokenExpr()
 			Expect(32)
 			tab.MakeOption(g); tokenString = noString 
-		} else if (la.kind == 37) {
+		} else if (la.kind == 38) {
 			Get()
 			g = TokenExpr()
-			Expect(38)
+			Expect(39)
 			tab.MakeIteration(g); tokenString = noString 
-		} else SynErr(62)
+		} else SynErr(63)
 		result = g ?: Graph(tab.NewNode(Node.eps, null, 0)); // invalid start of TokenFactor
 		
 		return result
 	}
 
 	private fun Bracketed() {
-		if (la.kind == 35) {
+
+		if (la.kind == 36) {
 			Get()
 			while (StartOf(29)) {
-				if (la.kind == 31 || la.kind == 35) {
+				if (la.kind == 31 || la.kind == 36) {
 					Bracketed()
 				} else {
 					Get()
 				}
 			}
-			Expect(36)
+			Expect(37)
 		} else if (la.kind == 31) {
 			Get()
 			while (StartOf(30)) {
-				if (la.kind == 31 || la.kind == 35) {
+				if (la.kind == 31 || la.kind == 36) {
 					Bracketed()
 				} else {
 					Get()
 				}
 			}
 			Expect(32)
-		} else SynErr(63)
+		} else SynErr(64)
 	}
 
 
@@ -905,37 +916,37 @@ class Parser(var scanner: Scanner) {
 	}
 
 	val set: Array<Array<Boolean>> = arrayOf(
-		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _x,_T,_x,_T, _T,_x,_T,_x, _x,_x),
-		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x),
-		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x),
-		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x),
-		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x),
-		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _T,_x),
-		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x,_x),
-		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x),
-		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_T, _T,_x,_T,_x, _x,_x),
-		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _x,_T,_x,_T, _x,_x,_T,_x, _x,_x),
-		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_T,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_x),
-		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x)
+		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _T,_T,_T,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_x,_T,_x, _T,_T,_x,_T, _x,_x,_x),
+		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x),
+		arrayOf(_T,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x),
+		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x),
+		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x),
+		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_x),
+		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _T,_x,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _x,_x,_x),
+		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x),
+		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_x,_T,_x, _T,_T,_x,_T, _x,_x,_x),
+		arrayOf(_x,_T,_x,_T, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_x,_T,_x, _T,_x,_x,_T, _x,_x,_x),
+		arrayOf(_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_T,_x, _x,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _x,_T,_T,_x, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_x,_x, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x,_T, _T,_T,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_T, _T,_T,_T,_T, _T,_T,_x),
+		arrayOf(_x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _x,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x)
 
     )
 
@@ -994,37 +1005,38 @@ class Errors {
 			30 -> "\".>\" expected"
 			31 -> "\"[\" expected"
 			32 -> "\"]\" expected"
-			33 -> "\"|\" expected"
-			34 -> "\"WEAK\" expected"
-			35 -> "\"(\" expected"
-			36 -> "\")\" expected"
-			37 -> "\"{\" expected"
-			38 -> "\"}\" expected"
-			39 -> "\"SYNC\" expected"
-			40 -> "\"IF\" expected"
-			41 -> "\"CONTEXT\" expected"
-			42 -> "\"(.\" expected"
-			43 -> "\".)\" expected"
-			44 -> "??? expected"
-			45 -> "this symbol not expected in Coco"
-			46 -> "this symbol not expected in TokenDecl"
-			47 -> "invalid TokenDecl"
-			48 -> "invalid AttrDecl"
+			33 -> "\"?\" expected"
+			34 -> "\"|\" expected"
+			35 -> "\"WEAK\" expected"
+			36 -> "\"(\" expected"
+			37 -> "\")\" expected"
+			38 -> "\"{\" expected"
+			39 -> "\"}\" expected"
+			40 -> "\"SYNC\" expected"
+			41 -> "\"IF\" expected"
+			42 -> "\"CONTEXT\" expected"
+			43 -> "\"(.\" expected"
+			44 -> "\".)\" expected"
+			45 -> "??? expected"
+			46 -> "this symbol not expected in Coco"
+			47 -> "this symbol not expected in TokenDecl"
+			48 -> "invalid TokenDecl"
 			49 -> "invalid AttrDecl"
 			50 -> "invalid AttrDecl"
 			51 -> "invalid AttrDecl"
 			52 -> "invalid AttrDecl"
-			53 -> "invalid SimSet"
-			54 -> "invalid Sym"
-			55 -> "invalid Term"
-			56 -> "invalid Factor"
-			57 -> "invalid Attribs"
+			53 -> "invalid AttrDecl"
+			54 -> "invalid SimSet"
+			55 -> "invalid Sym"
+			56 -> "invalid Term"
+			57 -> "invalid Factor"
 			58 -> "invalid Attribs"
 			59 -> "invalid Attribs"
 			60 -> "invalid Attribs"
 			61 -> "invalid Attribs"
-			62 -> "invalid TokenFactor"
-			63 -> "invalid Bracketed"
+			62 -> "invalid Attribs"
+			63 -> "invalid TokenFactor"
+			64 -> "invalid Bracketed"
 			else -> "error $n"
 		}
 		printMsg(line, col, s);

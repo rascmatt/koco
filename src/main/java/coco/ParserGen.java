@@ -339,7 +339,10 @@ public class ParserGen {
       gen.print(")");
       if (sym.retType != null) gen.print(": " + sym.retType);
       gen.println(" {");
-      if (sym.retVar != null) gen.println("\t\tvar " + sym.retVar + ": " + sym.retType);
+      if (sym.retVar != null) gen.print("\t\tvar " + sym.retVar + ": " + sym.retType);
+      if (sym.retType != null && sym.retType.trim().endsWith("?"))
+          gen.println("= null");
+      else gen.println();
       CopySourcePart(sym.semPos, 2);
       GenCode(sym.graph, 2, new BitSet(tab.terminals.size()));
       if (sym.retVar != null) gen.println("\t\treturn " + sym.retVar);
