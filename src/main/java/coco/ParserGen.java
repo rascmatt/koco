@@ -302,6 +302,24 @@ public class ParserGen {
     }
   }
 
+  void GenTerminalMap() {
+      // Ignore last terminal, which is the fallback ???
+      for (int i = 0; i < tab.terminals.size() - 1; i++) {
+          Symbol sym = (Symbol) tab.terminals.get(i);
+          gen.print("\t\t\t");
+          if (sym.name.startsWith("\"")) {
+              gen.print(sym.name);
+          }
+          else {
+              gen.print("\"" + sym.name + "\"");
+          }
+          gen.print(" to " + sym.n);
+          if (i < tab.terminals.size() - 2) {
+              gen.println(",");
+          }
+      }
+  }
+
   void GenTokens() {
     //foreach (Symbol sym in Symbol.terminals) {
     for (int i = 0; i < tab.terminals.size(); i++) {
@@ -393,6 +411,9 @@ public class ParserGen {
       gen.println(); gen.println();
       CopySourcePart(usingPos, 0);
     }
+
+    g.CopyFramePart("-->terminals");
+    GenTerminalMap();
 
     g.CopyFramePart("-->constants");
 

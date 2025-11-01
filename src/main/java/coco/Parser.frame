@@ -5,18 +5,18 @@ extended by M. Loeberbauer & A. Woess, Univ. of Linz
 ported from C# to Java by Wolfgang Ahorner
 with improvements by Pat Terry, Rhodes University
 
-This program is free software; you can redistribute it and/or modify it 
-under the terms of the GNU General Public License as published by the 
-Free Software Foundation; either version 2, or (at your option) any 
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2, or (at your option) any
 later version.
 
-This program is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 for more details.
 
-You should have received a copy of the GNU General Public License along 
-with this program; if not, write to the Free Software Foundation, Inc., 
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 As an exception, it is allowed to write an extension of Coco/R that is
@@ -30,6 +30,10 @@ Coco/R itself) does not fall under the GNU General Public License.
 class Parser(var scanner: Scanner) {
 
     companion object {
+
+        val terminals: Map<String, Int> = mapOf(
+-->terminals
+        )
 
 -->constants
 
@@ -55,7 +59,7 @@ class Parser(var scanner: Scanner) {
 		if (errDist >= minErrDist) errors.SemErr(t.line, t.col, msg)
 		errDist = 0
 	}
-	
+
 	private fun Get () {
 		while (true) {
 			t = la
@@ -68,15 +72,15 @@ class Parser(var scanner: Scanner) {
 			la = t
 		}
 	}
-	
+
 	private fun Expect (n: Int) {
 		if (la.kind==n) Get() else { SynErr(n) }
 	}
-	
+
 	private fun StartOf (s: Int): Boolean {
 		return set[s][la.kind]
 	}
-	
+
 	private fun ExpectWeak (n: Int, follow: Int) {
 		if (la.kind == n) Get()
 		else {
@@ -84,7 +88,7 @@ class Parser(var scanner: Scanner) {
 			while (!StartOf(follow)) Get()
 		}
 	}
-	
+
 	private fun WeakSeparator (n: Int, syFol: Int, repFol: Int): Boolean {
 		var kind = la.kind
 		if (kind == n) { Get(); return true }
@@ -98,7 +102,7 @@ class Parser(var scanner: Scanner) {
 			return StartOf(syFol)
 		}
 	}
-	
+
 -->productions
 
 	fun Parse() {
@@ -120,7 +124,7 @@ class Errors {
 	var count = 0;                                  // number of errors detected
 	val errorStream = System.out;                   // error messages go to this stream
 	val errMsgFormat = "-- line {0} col {1}: {2}";  // 0=line, 1=column, 2=text
-	
+
 	protected fun printMsg(line: Int, column: Int, msg: String) {
 		val b = StringBuffer(errMsgFormat)
 		var pos = b.indexOf("{0}")
@@ -131,7 +135,7 @@ class Errors {
 		if (pos >= 0) b.replace(pos, pos+3, msg)
 		errorStream.println(b.toString())
 	}
-	
+
 	fun SynErr (line: Int, col: Int, n: Int) {
 		val s = when (n) {
 		    -->errors
@@ -145,16 +149,16 @@ class Errors {
 		printMsg(line, col, s)
 		count++
 	}
-	
+
 	fun SemErr (s: String) {
 		errorStream.println(s)
 		count++
 	}
-	
+
 	fun Warning (line: Int, col: Int, s: String) {
 		printMsg(line, col, s)
 	}
-	
+
 	fun Warning (s: String) {
 		errorStream.println(s)
 	}
