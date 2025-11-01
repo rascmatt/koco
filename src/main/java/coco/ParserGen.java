@@ -431,7 +431,7 @@ public class ParserGen {
     tab = parser.tab;
     errors = parser.getErrors();
     trace = parser.trace;
-    buffer = parser.getScanner().buffer;
+    buffer = parser.getScanner().getBuffer();
     errorNr = -1;
     usingPos = null;
   }

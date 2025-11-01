@@ -49,18 +49,5 @@ tasks.register<JavaExec>("generateParser") {
     mainClass.set("coco.Coco")
 
     args("src/main/java/coco/Coco.atg")
-    args("-o", "src/main/java/coco")
-
-    // The 'Parser.kt' is generated in the 'java' directory, so this moves it to 'kotlin'
-    doLast {
-        val original = file("src/main/kotlin/Parser.kt")
-        if (original.exists()) {
-            val renamed = file("src/main/kotlin/Parser.kt.old").toPath()
-            Files.move(original.toPath(), renamed, StandardCopyOption.REPLACE_EXISTING)
-        }
-
-        val from = file("src/main/java/coco/Parser.kt").toPath()
-        val to = file("src/main/kotlin/Parser.kt").toPath()
-        Files.move(from, to, StandardCopyOption.REPLACE_EXISTING)
-    }
+    args("-o", "src/main/kotlin")
 }
